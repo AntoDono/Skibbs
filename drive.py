@@ -143,8 +143,10 @@ if __name__ == "__main__":
         
         # Test each wheel one by one
         for wheel_name in drive.motors.keys():
+            print(f"Driving {wheel_name}...")
             drive.drive_wheel(wheel_name, speed=0.5, duration=2)
-            time.sleep(1)  # Brief pause between wheels
+            
+        time.sleep(1)  # Brief pause between wheels
         
         print("All wheel tests completed!")
         

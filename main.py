@@ -1,6 +1,7 @@
 import cv2
 from detection import init_camera, init_segmentation, detect_human, get_human_box
 from drive import Drive
+import time
 
 # Global parameters
 POSITION_COEFFICIENT = 0.5  # Controls how position deviation is scaled
@@ -103,7 +104,7 @@ def control_back_wheels(drive, deviations):
     right_speed = max(0, min(1, right_speed))
     
     # Control only back wheels
-    drive.back_drive(left_speed=left_speed, right_speed=right_speed, duration=None)
+    drive.front_drive(left_speed=left_speed, right_speed=right_speed, duration=None)
 
 def draw_deviation_info(frame, deviations):
     """Draw deviation info on frame"""
@@ -148,7 +149,6 @@ def main():
                 break
             
             # Flip frame horizontally to fix mirrored view
-            frame = cv2.flip(frame, 1)
             
             if target_human_area is None:
                 target_human_area = frame.shape[1] * frame.shape[0] * HUMAN_AREA_TARGET
