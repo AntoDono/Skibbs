@@ -70,8 +70,8 @@ def draw_human_box(frame, box_coords):
                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
     return frame
 
-def control_back_wheels(drive, deviations):
-    """Control back wheels based on deviations to center human"""
+def control_all_wheels(drive, deviations):
+    """Control all wheels based on deviations to center human"""
     x_dev = deviations["x"]  # Area deviation (forward/backward)
     y_dev = deviations["y"]  # Position deviation (left/right)
     
@@ -88,12 +88,12 @@ def control_back_wheels(drive, deviations):
     forward_speed = base_speed * abs(x_dev)
     
     # For turning: positive y means human is right (turn right)
-    # Turn by differential speed on back wheels
+    # Turn by differential speed on left vs right wheels
     if y_dev > 0:  # Human is to the right, turn right
         left_speed = forward_speed
-        right_speed = forward_speed * 0.5  # Slow down right wheel
+        right_speed = forward_speed * 0.5  # Slow down right wheels
     elif y_dev < 0:  # Human is to the left, turn left
-        left_speed = forward_speed * 0.5  # Slow down left wheel
+        left_speed = forward_speed * 0.5  # Slow down left wheels
         right_speed = forward_speed
     else:  # Go straight
         left_speed = forward_speed
@@ -103,8 +103,9 @@ def control_back_wheels(drive, deviations):
     left_speed = max(0, min(1, left_speed))
     right_speed = max(0, min(1, right_speed))
     
-    # Control only back wheels
-    drive.front_drive(left_speed=left_speed, right_speed=right_speed, duration=None)
+    # Control all wheels - front and rear wheels mirror each other for tank-style steering
+    drive.all_drive(front_left_speed=left_speed, front_right_speed=right_speed, 
+                    rear_left_speed=left_speed, rear_right_speed=right_speed, duration=None)
 
 def draw_deviation_info(frame, deviations):
     """Draw deviation info on frame"""
@@ -165,7 +166,7 @@ def main():
                 deviations = get_deviations(box_coords, human_area, target_human_area, frame.shape[1])
                 
                 # Control robot
-                control_back_wheels(drive, deviations)
+                control_all_wheels(drive, deviations)
                 
                 # Draw visualizations
                 frame = draw_human_box(frame, box_coords)
@@ -185,6 +186,7 @@ def main():
     finally:
         # Cleanup
         drive.stop_all()
+        drive.cleanup()  # Clean up BTS7960 motor resources
         camera.release()
         cv2.destroyAllWindows()
 
