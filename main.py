@@ -164,6 +164,8 @@ def main():
                 
                 # Get deviations
                 deviations = get_deviations(box_coords, human_area, target_human_area, frame.shape[1])
+
+                print(f"Deviations: {deviations}")
                 
                 # Control robot
                 control_all_wheels(drive, deviations)
@@ -176,6 +178,8 @@ def main():
                 drive.stop_all()
                 cv2.putText(frame, 'No Human Detected', (10, 30), 
                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+
+            time.sleep(0.5)
                 
             # Display frame
             cv2.imshow('Human Tracking Robot', frame)

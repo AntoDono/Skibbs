@@ -162,7 +162,6 @@ class Drive:
     
     def front_drive(self, left_speed=0.5, right_speed=0.5, duration=2):
         """Drive front wheels with individual speed control, or continuously if duration=None"""
-        print(f"Driving front wheels - Left: {left_speed}, Right: {right_speed}")
         
         # Start front motors
         front_left_motor = self.motors['front_left']
@@ -176,12 +175,10 @@ class Drive:
             # Stop front motors
             front_left_motor.stop()
             front_right_motor.stop()
-            print("Front wheels stopped")
         # If duration is None, motors keep running until stop_all() is called
     
     def back_drive(self, left_speed=0.5, right_speed=0.5, duration=2):
         """Drive back wheels with individual speed control, or continuously if duration=None"""
-        print(f"Driving back wheels - Left: {left_speed}, Right: {right_speed}")
         
         # Start back motors
         rear_left_motor = self.motors['rear_left']
@@ -195,12 +192,10 @@ class Drive:
             # Stop back motors
             rear_left_motor.stop()
             rear_right_motor.stop()
-            print("Back wheels stopped")
         # If duration is None, motors keep running until stop_all() is called
     
     def all_drive(self, front_left_speed=0.5, front_right_speed=0.5, rear_left_speed=0.5, rear_right_speed=0.5, duration=2):
         """Drive all wheels with individual speed control for each wheel, or continuously if duration=None"""
-        print(f"Driving all wheels - FL: {front_left_speed}, FR: {front_right_speed}, RL: {rear_left_speed}, RR: {rear_right_speed}")
         
         # Start all motors with individual speeds
         self.motors['front_left'].forward(front_left_speed)
@@ -213,7 +208,6 @@ class Drive:
             # Stop all motors
             for motor in self.motors.values():
                 motor.stop()
-            print("All wheels stopped")
         # If duration is None, motors keep running until stop_all() is called
     
     def stop_all(self):
