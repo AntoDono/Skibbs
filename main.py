@@ -148,6 +148,11 @@ def main():
     parser.add_argument('--cmd', action='store_true', help='Run without displaying video frame')
     args = parser.parse_args()
     
+    # Set OpenCV backend for headless mode
+    if args.cmd:
+        import os
+        os.environ['QT_QPA_PLATFORM'] = 'offscreen'
+    
     # Initialize detection components
     camera = init_camera()
     segmentation = init_segmentation()
