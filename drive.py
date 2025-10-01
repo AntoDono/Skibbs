@@ -42,7 +42,7 @@ class BTS7960Motor:
         try:
             self.lpmh.off()  # Turn off reverse
             # Cap PWM at 0.5
-            capped_speed = min(speed, 0.5)
+            capped_speed = min(speed, 0.7)
             self.rpmh.value = capped_speed
         except Exception as e:
             logger.error(f"Error driving forward: {e}")
@@ -56,7 +56,7 @@ class BTS7960Motor:
         try:
             self.rpmh.off()  # Turn off forward
             # Cap PWM at 0.5
-            capped_speed = min(speed, 0.5)
+            capped_speed = min(speed, 0.7)
             self.lpmh.value = capped_speed
         except Exception as e:
             logger.error(f"Error driving backward: {e}")
