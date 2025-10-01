@@ -5,6 +5,7 @@ import logging
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+PWM_CAP = 0.7
 
 
 class BTS7960Motor:
@@ -42,7 +43,7 @@ class BTS7960Motor:
         try:
             self.lpmh.off()  # Turn off reverse
             # Cap PWM at 0.5
-            capped_speed = min(speed, 0.5)
+            capped_speed = min(speed, PWM_CAP)
             self.rpmh.value = capped_speed
         except Exception as e:
             logger.error(f"Error driving forward: {e}")
@@ -56,7 +57,7 @@ class BTS7960Motor:
         try:
             self.rpmh.off()  # Turn off forward
             # Cap PWM at 0.5
-            capped_speed = min(speed, 0.5)
+            capped_speed = min(speed, PWM_CAP)
             self.lpmh.value = capped_speed
         except Exception as e:
             logger.error(f"Error driving backward: {e}")

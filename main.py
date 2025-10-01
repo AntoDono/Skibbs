@@ -191,7 +191,7 @@ def main():
                     cv2.putText(frame, 'No Human Detected', (10, 30), 
                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
-            time.sleep(0.5)
+            time.sleep(0.1)
                 
             # Display frame only if not in cmd mode
             if not args.cmd:
