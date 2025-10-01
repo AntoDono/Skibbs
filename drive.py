@@ -101,10 +101,10 @@ class Drive:
         try:
             logger.info("Initializing Drive system...")
             
-            # Front Left Motor
-            # RPMH 2 - black, LPMH 3 - white, R-EN 4 - grey, L-EN 17 - purple
+            # Front Left Motor (flipped pins for correct direction)
+            # LPMH 2 - black, RPMH 3 - white, R-EN 4 - grey, L-EN 17 - purple
             logger.info("Initializing front left motor...")
-            self.front_left_motor = BTS7960Motor(rpmh_pin=2, lpmh_pin=3, r_en_pin=4, l_en_pin=17)
+            self.front_left_motor = BTS7960Motor(rpmh_pin=3, lpmh_pin=2, r_en_pin=4, l_en_pin=17)
             self.motors['front_left'] = self.front_left_motor
             self.initialized_motors.append('front_left')
             
@@ -115,10 +115,10 @@ class Drive:
             self.motors['front_right'] = self.front_right_motor
             self.initialized_motors.append('front_right')
             
-            # Rear Left Motor
-            # RPMH 11 - green, LPMH 5 - blue, R-EN 6 - purple, L-EN 13 - grey
+            # Rear Left Motor (flipped pins for correct direction)
+            # LPMH 11 - green, RPMH 5 - blue, R-EN 6 - purple, L-EN 13 - grey
             logger.info("Initializing rear left motor...")
-            self.rear_left_motor = BTS7960Motor(rpmh_pin=11, lpmh_pin=5, r_en_pin=6, l_en_pin=13)
+            self.rear_left_motor = BTS7960Motor(rpmh_pin=5, lpmh_pin=11, r_en_pin=6, l_en_pin=13)
             self.motors['rear_left'] = self.rear_left_motor
             self.initialized_motors.append('rear_left')
             
