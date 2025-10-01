@@ -1,3 +1,4 @@
+from math import e
 import cv2
 from detection import init_camera, init_segmentation, detect_human, get_human_box
 from drive import Drive
@@ -103,6 +104,8 @@ def control_all_wheels(drive, deviations):
     # Limit speeds to 0-1 range
     left_speed = max(0, min(1, left_speed))
     right_speed = max(0, min(1, right_speed))
+
+    print(f"Left Speed: {left_speed} | Right Speed: {right_speed}")
     
     # Control all wheels based on direction
     if x_dev < 0:  # Too far, go forward
