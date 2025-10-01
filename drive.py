@@ -17,12 +17,16 @@ class BTS7960Motor:
     def forward(self, speed=0.5):
         """Drive motor forward at specified speed (0.0 to 1.0)"""
         self.lpmh.off()  # Turn off reverse
-        self.rpmh.value = speed
+        # Cap PWM at 0.5
+        capped_speed = min(speed, 0.5)
+        self.rpmh.value = capped_speed
     
     def backward(self, speed=0.5):
         """Drive motor backward at specified speed (0.0 to 1.0)"""
         self.rpmh.off()  # Turn off forward
-        self.lpmh.value = speed
+        # Cap PWM at 0.5
+        capped_speed = min(speed, 0.5)
+        self.lpmh.value = capped_speed
     
     def stop(self):
         """Stop the motor"""
