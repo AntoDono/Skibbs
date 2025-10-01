@@ -210,6 +210,22 @@ class Drive:
                 motor.stop()
         # If duration is None, motors keep running until stop_all() is called
     
+    def all_drive_backward(self, front_left_speed=0.5, front_right_speed=0.5, rear_left_speed=0.5, rear_right_speed=0.5, duration=2):
+        """Drive all wheels backward with individual speed control for each wheel, or continuously if duration=None"""
+        
+        # Start all motors with individual speeds in reverse
+        self.motors['front_left'].backward(front_left_speed)
+        self.motors['front_right'].backward(front_right_speed)
+        self.motors['rear_left'].backward(rear_left_speed)
+        self.motors['rear_right'].backward(rear_right_speed)
+        
+        if duration is not None:
+            time.sleep(duration)
+            # Stop all motors
+            for motor in self.motors.values():
+                motor.stop()
+        # If duration is None, motors keep running until stop_all() is called
+    
     def stop_all(self):
         """Stop all motors"""
         for motor_name, motor in self.motors.items():

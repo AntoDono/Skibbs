@@ -2,6 +2,7 @@ import cv2
 from detection import init_camera, init_segmentation, detect_human, get_human_box
 from drive import Drive
 import time
+import argparse
 
 # Global parameters
 POSITION_COEFFICIENT = 0.5  # Controls how position deviation is scaled
@@ -84,28 +85,34 @@ def control_all_wheels(drive, deviations):
         return
     
     # Calculate wheel speeds
-    # For forward/backward: negative x means too far (go forward)
-    forward_speed = base_speed * abs(x_dev)
+    # For forward/backward: negative x means too far (go forward), positive x means too close (go backward)
+    movement_speed = base_speed * abs(x_dev)
     
     # For turning: positive y means human is right (turn right)
     # Turn by differential speed on left vs right wheels
     if y_dev > 0:  # Human is to the right, turn right
-        left_speed = forward_speed
-        right_speed = forward_speed * 0.5  # Slow down right wheels
+        left_speed = movement_speed
+        right_speed = movement_speed * 0.5  # Slow down right wheels
     elif y_dev < 0:  # Human is to the left, turn left
-        left_speed = forward_speed * 0.5  # Slow down left wheels
-        right_speed = forward_speed
+        left_speed = movement_speed * 0.5  # Slow down left wheels
+        right_speed = movement_speed
     else:  # Go straight
-        left_speed = forward_speed
-        right_speed = forward_speed
+        left_speed = movement_speed
+        right_speed = movement_speed
     
     # Limit speeds to 0-1 range
     left_speed = max(0, min(1, left_speed))
     right_speed = max(0, min(1, right_speed))
     
-    # Control all wheels - front and rear wheels mirror each other for tank-style steering
-    drive.all_drive(front_left_speed=left_speed, front_right_speed=right_speed, 
-                    rear_left_speed=left_speed, rear_right_speed=right_speed, duration=None)
+    # Control all wheels based on direction
+    if x_dev < 0:  # Too far, go forward
+        # Control all wheels - front and rear wheels mirror each other for tank-style steering
+        drive.all_drive(front_left_speed=left_speed, front_right_speed=right_speed, 
+                        rear_left_speed=left_speed, rear_right_speed=right_speed, duration=None)
+    elif x_dev > 0:  # Too close, go backward
+        # Control all wheels backward - front and rear wheels mirror each other for tank-style steering
+        drive.all_drive_backward(front_left_speed=left_speed, front_right_speed=right_speed, 
+                                rear_left_speed=left_speed, rear_right_speed=right_speed, duration=None)
 
 def draw_deviation_info(frame, deviations):
     """Draw deviation info on frame"""
@@ -136,6 +143,11 @@ def draw_deviation_info(frame, deviations):
     return frame
 
 def main():
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description='Human Tracking Robot')
+    parser.add_argument('--cmd', action='store_true', help='Run without displaying video frame')
+    args = parser.parse_args()
+    
     # Initialize detection components
     camera = init_camera()
     segmentation = init_segmentation()
@@ -155,7 +167,7 @@ def main():
                 target_human_area = frame.shape[1] * frame.shape[0] * HUMAN_AREA_TARGET
                 
             # Detect human
-            human_detected, mask = detect_human(frame, segmentation)
+            human_detected, mask = detect_human(frame, segmentation) 
             
             # Process if human found
             if human_detected:
@@ -164,35 +176,37 @@ def main():
                 
                 # Get deviations
                 deviations = get_deviations(box_coords, human_area, target_human_area, frame.shape[1])
-
-                print(f"Deviations: {deviations}")
                 
                 # Control robot
                 control_all_wheels(drive, deviations)
                 
-                # Draw visualizations
-                frame = draw_human_box(frame, box_coords)
-                frame = draw_deviation_info(frame, deviations)
+                # Draw visualizations only if not in cmd mode
+                if not args.cmd:
+                    frame = draw_human_box(frame, box_coords)
+                    frame = draw_deviation_info(frame, deviations)
             else:
                 # No human detected, stop robot
                 drive.stop_all()
-                cv2.putText(frame, 'No Human Detected', (10, 30), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                if not args.cmd:
+                    cv2.putText(frame, 'No Human Detected', (10, 30), 
+                               cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
             time.sleep(0.5)
                 
-            # Display frame
-            cv2.imshow('Human Tracking Robot', frame)
-            
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+            # Display frame only if not in cmd mode
+            if not args.cmd:
+                cv2.imshow('Human Tracking Robot', frame)
+                
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
     
     finally:
         # Cleanup
         drive.stop_all()
         drive.cleanup()  # Clean up BTS7960 motor resources
         camera.release()
-        cv2.destroyAllWindows()
+        if not args.cmd:
+            cv2.destroyAllWindows()
 
 if __name__ == "__main__":
     main()
